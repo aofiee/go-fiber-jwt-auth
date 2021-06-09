@@ -56,7 +56,7 @@ services:
     container_name: microservices
     volumes:
       - "./microservices:/app"
-    working_dir: /app
+    working_dir: /app/cmd
     ports:
       - 8181:8181
     # command: go run main.go

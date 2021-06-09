@@ -52,7 +52,7 @@ func main() {
 
 	//need AuthorizationRequired
 	app.Get("/profile", routes.Profile)
-	app.Get("/logout", routes.Logout)
+	app.Delete("/logout", routes.Logout)
 	//end AuthorizationRequired
 
 	err := app.Listen(":" + os.Getenv("APP_PORT"))
