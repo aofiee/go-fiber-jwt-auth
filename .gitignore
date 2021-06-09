@@ -2,7 +2,7 @@
 .env
 database/
 queue/
-redis/
+redis/data/
 queue
 web/node_modules/
 web/
