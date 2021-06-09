@@ -8,5 +8,4 @@ require (
 	github.com/gofiber/fiber/v2 v2.11.0
 	github.com/gofiber/jwt/v2 v2.2.2
 	github.com/joho/godotenv v1.3.0
-	github.com/streadway/amqp v1.0.0
 )

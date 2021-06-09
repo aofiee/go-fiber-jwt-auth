@@ -52,10 +52,10 @@ services:
     # image: golang:1.16-alpine
     build:
       context: .
-      dockerfile: ./microservices/go-dev.Dockerfile
-    container_name: microservices
+      dockerfile: ./api/go-dev.Dockerfile
+    container_name: api
     volumes:
-      - "./microservices:/app"
+      - "./api:/app"
     working_dir: /app/cmd
     ports:
       - 8181:8181

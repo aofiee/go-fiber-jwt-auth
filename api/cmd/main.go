@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/aofiee/diablos/routes"
@@ -54,9 +55,16 @@ func main() {
 	app.Get("/profile", routes.Profile)
 	app.Delete("/logout", routes.Logout)
 	//end AuthorizationRequired
-
+	for _, r := range app.Stack() {
+		for _, v := range r {
+			if v.Path != "/" {
+				fmt.Printf("%v \t %s\n", v.Method, v.Path)
+			}
+		}
+	}
 	err := app.Listen(":" + os.Getenv("APP_PORT"))
 	if err != nil {
 		panic(err)
 	}
+
 }
