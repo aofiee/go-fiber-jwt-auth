@@ -1,0 +1,9 @@
+*.code-workspace
+.env
+database/
+queue/
+redis/
+queue
+web/node_modules/
+web/
+*.bak

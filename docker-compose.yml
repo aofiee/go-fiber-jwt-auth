@@ -1,0 +1,71 @@
+version: "3.8"
+services:
+  database:
+    image: mariadb:10.6
+    container_name: db
+    ports:
+      - 3308:3306
+    volumes:
+      - "./database:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: \t=H9fB_uy/2A\ax
+      MYSQL_DATABASE: diablos
+    networks:
+      - diablos
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    ports:
+      - 8000:80
+    environment:
+      PMA_PASSWORD: \t=H9fB_uy/2A\ax
+      PMA_USER: root
+      PMA_HOSTS: database
+    networks:
+      - diablos
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - "./queue/data:/var/lib/rabbitmq"
+      - "./queue/log:/var/log/rabbitmq"
+    networks:
+      - diablos
+  redis:
+    image: "redis:latest"
+    container_name: redis
+    hostname: redis
+    command: ["redis-server", "--include", "/usr/local/etc/redis/redis.conf"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./redis/data:/var/lib/redis"
+      - "./redis/redis.conf:/usr/local/etc/redis/redis.conf"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    networks:
+      - diablos
+  api:
+    # image: golang:1.16-alpine
+    build:
+      context: .
+      dockerfile: ./microservices/go-dev.Dockerfile
+    container_name: microservices
+    volumes:
+      - "./microservices:/app"
+    working_dir: /app
+    ports:
+      - 8181:8181
+    # command: go run main.go
+    links:
+      - database
+      - rabbitmq
+      - redis
+    networks:
+      - diablos
+networks:
+  diablos:
+    driver: bridge

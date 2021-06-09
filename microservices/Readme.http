@@ -1,0 +1,37 @@
+@hostname = localhost
+@port = 8181
+@host = {{hostname}}:{{port}}
+@contentType = application/json
+
+###
+GET http://{{host}}/
+Content-Type: {{contentType}}
+
+###
+POST http://{{host}}/login
+Content-Type: {{contentType}}
+
+{
+    "username":"aofiee",
+    "password":"password"
+}
+
+###
+GET http://{{host}}/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6Ijg3YzYzZGE5LWVmNTItNDkwNS1iNmU0LWViMGMwNWU4MDViYyIsImNvbnRleHQiOnsidXNlciI6ImFvZmllZTY2NkBnbWFpbC5jb20iLCJkaXNwbGF5X25hbWUiOiJLaG9ta3JpZCBMLiIsInJvbGVzIjpbImFkbWluIiwicmVwb3J0Il19LCJleHAiOjE2MjMyMzQ4ODQsImlhdCI6MTYyMzIzMzk4NCwiaXNzIjoiRGlhYmxvcyIsInN1YiI6IjE0NDQ3OWJkLWZjZGMtNGM5Zi1iMTE2LWYyYTA4ODA3YTRjMyJ9.PHvCKwBZESfRrAES0X98GA4XK6fyg9FKlPu90ubDKZc
+
+###
+GET http://{{host}}/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6Ijg3YzYzZGE5LWVmNTItNDkwNS1iNmU0LWViMGMwNWU4MDViYyIsImNvbnRleHQiOnsidXNlciI6ImFvZmllZTY2NkBnbWFpbC5jb20iLCJkaXNwbGF5X25hbWUiOiJLaG9ta3JpZCBMLiIsInJvbGVzIjpbImFkbWluIiwicmVwb3J0Il19LCJleHAiOjE2MjMyMzQ4ODQsImlhdCI6MTYyMzIzMzk4NCwiaXNzIjoiRGlhYmxvcyIsInN1YiI6IjE0NDQ3OWJkLWZjZGMtNGM5Zi1iMTE2LWYyYTA4ODA3YTRjMyJ9.PHvCKwBZESfRrAES0X98GA4XK6fyg9FKlPu90ubDKZc
+
+###
+POST http://{{host}}/refresh
+Content-Type: application/x-www-form-urlencoded
+
+refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZXh0IjpudWxsLCJleHAiOjE2MjM4Mzg3MjgsImlhdCI6MTYyMzIzMzkyOCwiaXNzIjoiRGlhYmxvcyIsInJlZnJlc2hfdXVpZCI6IjE2YzRmZWE0LWZmZmEtNGY0ZS1hMTIyLWY5YzVjMjJkOTA0ZiIsInN1YiI6IjE0NDQ3OWJkLWZjZGMtNGM5Zi1iMTE2LWYyYTA4ODA3YTRjMyJ9.KOr_JYHmm7ZrrdK0bXkjTo0CHY_DiSNdukQXY1Vjod0
+
+###
+POST http://{{host}}/refresh
+Content-Type: {{contentType}}
+
+{"refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZXh0IjpudWxsLCJleHAiOjE2MjM4Mzg3MjgsImlhdCI6MTYyMzIzMzkyOCwiaXNzIjoiRGlhYmxvcyIsInJlZnJlc2hfdXVpZCI6IjE2YzRmZWE0LWZmZmEtNGY0ZS1hMTIyLWY5YzVjMjJkOTA0ZiIsInN1YiI6IjE0NDQ3OWJkLWZjZGMtNGM5Zi1iMTE2LWYyYTA4ODA3YTRjMyJ9.KOr_JYHmm7ZrrdK0bXkjTo0CHY_DiSNdukQXY1Vjod0"}
