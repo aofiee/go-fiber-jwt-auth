@@ -10,7 +10,9 @@ import (
 	"testing"
 
 	"github.com/aofiee/diablos/types"
+
 	// fiber "github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2"
 	utils "github.com/gofiber/fiber/v2/utils"
 )
 
@@ -18,8 +20,12 @@ type (
 	TLogin types.Login
 )
 
+var (
+	app *fiber.App
+)
+
 func TestMain(t *testing.T) {
-	app := Setup()
+	app = Setup()
 	utils.AssertEqual(t, "*fiber.App", reflect.TypeOf(app).String(), "Setup()")
 	t.Run("SUCCESS_ROOT", func(t *testing.T) {
 		log.Println("app", reflect.TypeOf(app))

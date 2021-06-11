@@ -3,16 +3,16 @@ package routes
 import (
 	"context"
 	"fmt"
-	"os"
+	"log"
 	"time"
 
+	"github.com/aofiee/diablos/diablosutils"
 	"github.com/aofiee/diablos/types"
 	"github.com/form3tech-oss/jwt-go"
 	"github.com/go-redis/redis/v8"
 	fiber "github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 	jwtware "github.com/gofiber/jwt/v2"
-	"github.com/joho/godotenv"
 )
 
 type (
@@ -24,24 +24,24 @@ type (
 )
 
 var (
-	rdAddr    = ""
-	rdConn    *redis.Client
-	rbqDNS    = ""
+	rdConn *redis.Client
+	//rbqDNS    = "amqp://" + os.Getenv("RB_USER") + ":" + os.Getenv("RB_PASSWORD") + "@" + os.Getenv("RB_HOST") + ":" + os.Getenv("RB_PORT") + "/"
 	rbmqATExp = "900000"
 	rbmqRTExp = "604800000"
+	config    diablosutils.Config
 )
 
 func init() {
-	err := godotenv.Load(".env")
+	log.Println("init in routes")
+	var err error
+	config, err = diablosutils.LoadConfig("../")
 	if err != nil {
 		panic("Error loading .env file")
 	}
-	rbqDNS = "amqp://" + os.Getenv("RB_USER") + ":" + os.Getenv("RB_PASSWORD") + "@" + os.Getenv("RB_HOST") + ":" + os.Getenv("RB_PORT") + "/"
-
-	rdAddr = os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT")
+	rdAddr := config.RdHost + ":" + config.RdPort
 	rdConn = redis.NewClient(&redis.Options{
 		Addr:     rdAddr,
-		Password: os.Getenv("REDIS_PASSWORD"),
+		Password: config.RdPassword,
 		// DB:       0,
 	})
 }
@@ -84,7 +84,7 @@ func generateTokenBy(uid string, rdKey string, ctx interface{}, signed string, e
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	location, _ := time.LoadLocation("Asia/Bangkok")
-	claims["iss"] = os.Getenv("APP_NAME")
+	claims["iss"] = config.AppName
 	claims["sub"] = uid
 	claims["exp"] = expire
 	claims["iat"] = time.Now().In(location).Unix()
@@ -122,11 +122,11 @@ func createToken(uid string) (*MsgTokenDetail, error) {
 	ctAccess.Roles = roles
 	tokenDetail.Context = ctAccess
 	/////mock data/////
-	tokenDetail.Token.AccessToken, err = generateTokenBy(uid, tokenDetail.AccessUUid, ctAccess, os.Getenv("ACCESS_TOKEN_SECRET"), tokenDetail.AccessTokenExp)
+	tokenDetail.Token.AccessToken, err = generateTokenBy(uid, tokenDetail.AccessUUid, ctAccess, config.AccessKey, tokenDetail.AccessTokenExp)
 	if err != nil {
 		return tokenDetail, err
 	}
-	tokenDetail.Token.RefreshToken, err = generateTokenBy(uid, tokenDetail.RefreshUUid, nil, os.Getenv("REFRESH_TOKEN_SECRET"), tokenDetail.RefreshTokenExp)
+	tokenDetail.Token.RefreshToken, err = generateTokenBy(uid, tokenDetail.RefreshUUid, nil, config.RefreshKey, tokenDetail.RefreshTokenExp)
 	if err != nil {
 		return tokenDetail, err
 	}
@@ -164,7 +164,7 @@ func AuthorizationRequired() fiber.Handler {
 	return jwtware.New(jwtware.Config{
 		SuccessHandler: AuthSuccess,
 		ErrorHandler:   AuthError,
-		SigningKey:     []byte(os.Getenv("ACCESS_TOKEN_SECRET")),
+		SigningKey:     []byte(config.AccessKey),
 		SigningMethod:  "HS256",
 		TokenLookup:    "header:Authorization",
 		AuthScheme:     "Bearer",
@@ -225,7 +225,7 @@ func VerifyToken(token *jwt.Token) (interface{}, error) {
 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 		return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 	}
-	return []byte(os.Getenv("REFRESH_TOKEN_SECRET")), nil
+	return []byte(config.RefreshKey), nil
 }
 
 func RefreshToken(c *fiber.Ctx) error {

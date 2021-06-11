@@ -1,25 +1,27 @@
 package main
 
 import (
-	"os"
+	"log"
 
+	"github.com/aofiee/diablos/diablosutils"
 	"github.com/aofiee/diablos/routes"
 	fiber "github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/fiber/v2/utils"
-	"github.com/joho/godotenv"
 )
 
-func init() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		panic("Error loading .env file")
-	}
-}
+var (
+	config diablosutils.Config
+)
 
 func Setup() *fiber.App {
+	var err error
+	config, err = diablosutils.LoadConfig("../")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	app := fiber.New()
 	app.Use(requestid.New())
 	app.Use(requestid.New(requestid.Config{
@@ -35,7 +37,7 @@ func Setup() *fiber.App {
 	}))
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: os.Getenv("ALLOW_ORIGINS"),
+		AllowOrigins: config.AllowOrigins,
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
 
@@ -67,7 +69,7 @@ func Setup() *fiber.App {
 
 func main() {
 	app := Setup()
-	err := app.Listen(":" + os.Getenv("APP_PORT"))
+	err := app.Listen(":" + config.AppPort)
 	if err != nil {
 		panic(err)
 	}
