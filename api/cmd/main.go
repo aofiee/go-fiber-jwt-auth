@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/aofiee/diablos/routes"
@@ -13,15 +12,15 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var (
-	app = fiber.New()
-)
-
 func init() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		panic("Error loading .env file")
 	}
+}
+
+func Setup() *fiber.App {
+	app := fiber.New()
 	app.Use(requestid.New())
 	app.Use(requestid.New(requestid.Config{
 		Header: "Diablos-Service-Header",
@@ -34,13 +33,12 @@ func init() {
 		TimeFormat: "02-Jan-2006",
 		TimeZone:   "Asia/Bangkok",
 	}))
-}
 
-func main() {
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: os.Getenv("ALLOW_ORIGINS"),
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
+
 	//not AuthorizationRequired
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
@@ -55,16 +53,22 @@ func main() {
 	app.Get("/profile", routes.Profile)
 	app.Delete("/logout", routes.Logout)
 	//end AuthorizationRequired
-	for _, r := range app.Stack() {
-		for _, v := range r {
-			if v.Path != "/" {
-				fmt.Printf("%v \t %s\n", v.Method, v.Path)
+	/*
+		for _, r := range app.Stack() {
+			for _, v := range r {
+				if v.Path != "/" && v.Method != "HEAD" {
+					fmt.Printf("%v \t %s\n", v.Method, v.Path)
+				}
 			}
 		}
-	}
+	*/
+	return app
+}
+
+func main() {
+	app := Setup()
 	err := app.Listen(":" + os.Getenv("APP_PORT"))
 	if err != nil {
 		panic(err)
 	}
-
 }

@@ -71,7 +71,7 @@ func Auth(c *fiber.Ctx) error {
 	}
 	err = storeJWTAuthToRedis(c, uid, t)
 	if err != nil {
-		return failOnError(c, err, "StatusBadRequest", fiber.StatusBadRequest)
+		return failOnError(c, err, "StatusInternalServerError", fiber.StatusInternalServerError)
 	}
 	c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"access_token":  t.Token.AccessToken,
@@ -237,7 +237,7 @@ func RefreshToken(c *fiber.Ctx) error {
 	}
 	token, err := jwt.Parse(rt.Token, VerifyToken)
 	if err != nil {
-		return failOnError(c, err, "token signing error", fiber.StatusBadRequest)
+		return failOnError(c, err, "token signing error", fiber.StatusUnauthorized)
 	}
 	if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
 		return failOnError(c, err, "Refresh token expired", fiber.StatusUnauthorized)
@@ -246,15 +246,15 @@ func RefreshToken(c *fiber.Ctx) error {
 	if ok && token.Valid {
 		uid, ok := claims["sub"].(string)
 		if !ok {
-			return failOnError(c, err, "token signing error", fiber.StatusBadRequest)
+			return failOnError(c, err, "token signing error", fiber.StatusNotFound)
 		}
 		refreshAccesss, ok := claims["refresh_uuid"].(string)
 		if !ok {
-			return failOnError(c, err, "token signing error", fiber.StatusBadRequest)
+			return failOnError(c, err, "token signing error", fiber.StatusNotFound)
 		}
 		_, err = deleteAuthFromRedis(c, refreshAccesss)
 		if err != nil {
-			return failOnError(c, err, "StatusUnauthorized", fiber.StatusUnauthorized)
+			return failOnError(c, err, "StatusForbidden", fiber.StatusForbidden)
 		}
 		t, err := createToken(uid)
 		if err != nil {
