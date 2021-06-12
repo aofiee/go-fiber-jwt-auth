@@ -32,11 +32,10 @@ var (
 )
 
 func init() {
-	log.Println("init in routes")
 	var err error
 	config, err = diablosutils.LoadConfig("../")
 	if err != nil {
-		panic("Error loading .env file")
+		log.Fatal("Error loading .env file")
 	}
 	rdAddr := config.RdHost + ":" + config.RdPort
 	rdConn = redis.NewClient(&redis.Options{
